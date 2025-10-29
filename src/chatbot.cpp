@@ -13,8 +13,8 @@ private:
     struct Node
     {
         std::string nutzerEingabe;
-        std::string node_id;
-        std::string text;
+        std::string node_id = "";
+        std::string text = "";
         std::vector<Node> verlauf;
     };
     
@@ -80,24 +80,22 @@ public:
 
     Node respondNode(std::string userInput) 
     {
-        if (userInput.empty())
-        {
-            Node leise;
-            leise.text = "Koennten Sie bitte etwas lauter sprechen.";
-            leise.verlauf = start.verlauf;
-            return leise;
-        }
+        start.text = "Sorry, das habe ich leider nicht verstanden.";
 
+        if (userInput.empty())
+            start.text = "Koennten Sie bitte etwas lauter sprechen.";
+        
         std::string lowerInput = toLowerCase(userInput);
+
+        if(lowerInput.compare(start.nutzerEingabe) == 0)
+            start.text = "Du wiederholst Dich!";
 
         for(Node x : start.verlauf)
             if(x.nutzerEingabe.compare(lowerInput) == 0)
                 return x;
-
-        Node wieBitte;
-        wieBitte.nutzerEingabe = "Geben Sie in einem Terminal mal ipconfig ein und schauen Sie, ob Sie eine IP-Adresse, Netzmaske und ein Gateway haben.";
-        wieBitte.verlauf = start.verlauf;
-        return wieBitte;
+        
+        start.nutzerEingabe = lowerInput;
+        return start;
     }
 
     bool abschied(std::string userInput)

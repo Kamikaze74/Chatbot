@@ -1,8 +1,6 @@
 #include <iostream>
 #include <string>
-#include <src/chatbot.cpp>
-
-
+#include "chatbot.cpp"
 
 int main() 
 {
