@@ -25,7 +25,7 @@ int main(void)
         fgets(string_input, sizeof(string_input), stdin);
         string_input[strlen(string_input) - 1] = '\0'; // remove '\n' from input
 
-        if (strcmp(string_input, "Ciao"))
+        if (strcmp(string_input, "Ciao")) // wenn die strings gleich sind gibt strcmp 0 zuruck
         {
             selection = rand() % 5;
             puts(response[selection]);
