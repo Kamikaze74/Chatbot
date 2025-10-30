@@ -4,12 +4,10 @@
 #include <algorithm>
 #include <sstream>
 
-
 class Chatbot 
 {
 private:
     
-
     struct Node
     {
         std::string nutzerEingabe;
@@ -17,7 +15,18 @@ private:
         std::string text = "";
         std::vector<Node> verlauf;
     };
-    
+
+    Node start;
+    Node backToRoot;
+
+    Node newNode(std::string nutzerEingabe, std::string id, std::string text)
+    {
+        Node node;
+        node.nutzerEingabe = nutzerEingabe;
+        node.node_id = id;
+        node.text = text;
+        node.verlauf.push_back(backToRoot);
+    }
 
     std::string toLowerCase(std::string input)
         {
@@ -30,52 +39,24 @@ private:
 
 public:
 
-    Node start;
-
-
-
     Chatbot() 
     {
         // Dialogbaum mit Note
-        Node hallo;
-        hallo.nutzerEingabe = "hallo";
-        hallo.node_id = "0.0";
-        hallo.text = "Guten Tag, wie kann ich helfen?";
+        backToRoot = newNode("neustart", "0.1", "Wie kann ich sonst noch Helfen?");
+        Node hallo = newNode("hallo", "0.0", "Guten Tag, wie kann ich helfen?");
+        Node software = newNode("software", "1.0", "Schalten Sie den Flugmodlus aus.");
+        Node hardware = newNode("hardware", "2.0", "Stellen Sie den Schalter auf EIN.");
+        Node lan = newNode("lan", "3.0", "Geben Sie in einem Terminal mal ipconfig ein und schauen Sie, ob Sie eine IP-Adresse, Netzmaske und ein Gateway haben.");
+        Node wlan = newNode("wlan", "4.0", "Haben Sie die WLAN-Karte vielleicht hardwareseitig oder softwareseitig ausgeschaltet?");
+        Node netzwerk = newNode("netzwerk", "5.0", "Haben Sie WLAN oder LAN?");
 
-            Node software;
-                software.nutzerEingabe = "software";
-                software.node_id = "1.0";
-                software.text = "Schalten Sie den Flugmodus aus.";
-
-            Node hardware;
-                hardware.nutzerEingabe = "hardware";
-                hardware.node_id = "2.0";
-                hardware.text = "Stellen Sie den Schalter auf EIN.";
-
-            Node lan;
-                lan.nutzerEingabe = "lan";
-                lan.node_id = "3.0";
-                lan.text = "Geben Sie in einem Terminal mal ipconfig ein und schauen Sie, ob Sie eine IP-Adresse, Netzmaske und ein Gateway haben.";
-
-            Node wlan;
-                wlan.nutzerEingabe = "wlan";
-                wlan.node_id = "4.0";
-                wlan.text = "Haben Sie die WLAN-Karte vielleicht hardwareseitig oder softwareseitig ausgeschaltet?";
-            
-            Node netzwerk;
-                netzwerk.nutzerEingabe = "netzwerk";
-                netzwerk.node_id = "5.0";
-                netzwerk.text = "Haben Sie WLAN oder LAN?";
-
-        hallo.verlauf.push_back(software);
-        hallo.verlauf.push_back(hardware);
-        hallo.verlauf.push_back(lan);
-        hallo.verlauf.push_back(wlan);
-        hallo.verlauf.push_back(netzwerk);
-
+        start.verlauf.push_back(software);
+        start.verlauf.push_back(hardware);
+        start.verlauf.push_back(lan);
+        start.verlauf.push_back(wlan);
+        start.verlauf.push_back(netzwerk);
         start.verlauf.push_back(hallo);
-
-
+        start.verlauf.push_back(backToRoot);
     }
 
     Node respondNode(std::string userInput) 
@@ -93,6 +74,7 @@ public:
         for(Node x : start.verlauf)
             if(x.nutzerEingabe.compare(lowerInput) == 0)
                 return x;
+
         
         start.nutzerEingabe = lowerInput;
         return start;
