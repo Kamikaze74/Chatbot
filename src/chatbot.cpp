@@ -10,6 +10,7 @@ private:
     Node start;     // start node
     Node current;   // node sich fortzubewegen
     Node hallo;     // node's die in jeder anderen node enthaleten sein sollen auch als seperaten vector realisierbar
+    std::string history = "";
 
     Node newNode(std::string nutzerEingabe, std::string id, std::string text)
     {
@@ -54,10 +55,12 @@ public:
     {
         current.setText("Sorry, das habe ich leider nicht verstanden.");
 
-        if(userInput.compare(current.getNutzerEingabe()) == 0)  // innerhalb von dieser methode sind gleiche eingaben erlaubt solange sie im verlauf vorhanden sind
-            current.setText("Du wiederholst Dich!");
+        if (userInput.compare(history))
+            current.setText("Du wiederholst Dich!"); return; 
 
         current.getNutzerEingabe() = userInput;
+
+        bool transition_found = false;
 
         // & um eine referenz zu dem obejkt zu erhalten
         for(Node& x : current.getVerlauf())
@@ -67,8 +70,12 @@ public:
                     x.getVerlauf() = current.getVerlauf();
 
                 current = x;
+                transition_found = true;
                 break;
             }
+
+        history = userInput;
+        current.getNutzerEingabe() = userInput;
     }
 
     bool abschied(std::string userInput)
