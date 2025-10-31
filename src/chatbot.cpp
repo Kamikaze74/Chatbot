@@ -1,31 +1,21 @@
-#include <iostream>
-#include <string>
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include "node.cpp"
 
 class Chatbot 
 {
 private:
     
-    struct Node
-    {
-        std::string nutzerEingabe;
-        std::string node_id = "";
-        std::string text = "";
-        std::vector<Node> verlauf;
-    };
-
     Node start;
-    Node backToRoot;
+    Node current;
+    Node hallo;
 
     Node newNode(std::string nutzerEingabe, std::string id, std::string text)
     {
-        Node node;
-        node.nutzerEingabe = nutzerEingabe;
-        node.node_id = id;
-        node.text = text;
-        node.verlauf.push_back(backToRoot);
+        Node node = Node(nutzerEingabe, id, text);
+        node.verlaufPush(hallo);
+        return node;
     }
 
     std::string toLowerCase(std::string input)
@@ -42,53 +32,61 @@ public:
     Chatbot() 
     {
         // Dialogbaum mit Note
-        backToRoot = newNode("neustart", "0.1", "Wie kann ich sonst noch Helfen?");
-        Node hallo = newNode("hallo", "0.0", "Guten Tag, wie kann ich helfen?");
+        start = newNode("","","Wie kann ich dir sonst noch helfen?");
+        hallo = newNode("hallo", "0.0", "Guten Tag, wie kann ich helfen?");
+        hallo.setRepetable(true);
         Node software = newNode("software", "1.0", "Schalten Sie den Flugmodlus aus.");
         Node hardware = newNode("hardware", "2.0", "Stellen Sie den Schalter auf EIN.");
         Node lan = newNode("lan", "3.0", "Geben Sie in einem Terminal mal ipconfig ein und schauen Sie, ob Sie eine IP-Adresse, Netzmaske und ein Gateway haben.");
         Node wlan = newNode("wlan", "4.0", "Haben Sie die WLAN-Karte vielleicht hardwareseitig oder softwareseitig ausgeschaltet?");
         Node netzwerk = newNode("netzwerk", "5.0", "Haben Sie WLAN oder LAN?");
 
-        start.verlauf.push_back(software);
-        start.verlauf.push_back(hardware);
-        start.verlauf.push_back(lan);
-        start.verlauf.push_back(wlan);
-        start.verlauf.push_back(netzwerk);
-        start.verlauf.push_back(hallo);
-        start.verlauf.push_back(backToRoot);
+        start.verlaufPush(software);
+        start.verlaufPush(hardware);
+        start.verlaufPush(lan);
+        start.verlaufPush(wlan);
+        start.verlaufPush(netzwerk);
+        start.verlaufPush(hallo);
+        current = start;
     }
 
-    Node respondNode(std::string userInput) 
+    void respondNode(std::string userInput) 
     {
-        start.text = "Sorry, das habe ich leider nicht verstanden.";
-
-        if (userInput.empty())
-            start.text = "Koennten Sie bitte etwas lauter sprechen.";
+        current.text = "Sorry, das habe ich leider nicht verstanden.";
         
         std::string lowerInput = toLowerCase(userInput);
 
-        if(lowerInput.compare(start.nutzerEingabe) == 0)
-            start.text = "Du wiederholst Dich!";
+        if (lowerInput.compare("an anfang") == 0)
+            current = start;
 
-        for(Node x : start.verlauf)
-            if(x.nutzerEingabe.compare(lowerInput) == 0)
-                return x;
+        if(lowerInput.compare(current.nutzerEingabe) == 0)
+            current.text = "Du wiederholst Dich!";
 
-        
-        start.nutzerEingabe = lowerInput;
-        return start;
+        current.nutzerEingabe = lowerInput;
+
+        for(int i = 0; i < current.verlauf.size(); i++)
+            if(current.verlauf[i].nutzerEingabe.compare(lowerInput) == 0 && current.text.compare(lowerInput) != 0)
+            {
+                 if(current.verlauf[i].repetable)
+                    current.verlauf[i].verlauf = current.verlauf;
+                current = current.verlauf[i];
+            }
+
+       
     }
 
     bool abschied(std::string userInput)
     {
         std::string lowerInput = toLowerCase(userInput);
-
         return lowerInput == "exit" || lowerInput == "quit" || lowerInput == "ciao";
     }
 
     std::string respond(std::string userInput){
-        start = respondNode(userInput);
-        return start.text;
+        
+        if (userInput.empty())
+            return "Koennten Sie bitte etwas lauter sprechen.";
+
+        respondNode(userInput);
+        return current.text;
     }
 };
