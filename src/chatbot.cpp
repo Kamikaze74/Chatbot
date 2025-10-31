@@ -7,9 +7,9 @@ class Chatbot
 {
 private:
     
-    Node start;
-    Node current;
-    Node hallo;
+    Node start;     // start node
+    Node current;   // node sich fortzubewegen
+    Node hallo;     // node's die in jeder anderen node enthaleten sein sollen auch als seperaten vector realisierbar
 
     Node newNode(std::string nutzerEingabe, std::string id, std::string text)
     {
@@ -22,7 +22,7 @@ private:
         {
         std::string isLowerCase = input;
         std::transform(isLowerCase.begin(), isLowerCase.end(), isLowerCase.begin(),  // von, bis, nach,
-        [](unsigned char c){ return std::tolower(c);});                            // transmutaion (änderung) PK1 Lambda ausdruck. [] beginn eined Labdausdrucks
+        [](unsigned char c){ return std::tolower(c);});                            // transmutaion (änderung) PK1 Lambda ausdruck. ??[] beginn eined Labdausdrucks
 
         return isLowerCase;
     }
@@ -52,27 +52,28 @@ public:
 
     void respondNode(std::string userInput) 
     {
-        current.text = "Sorry, das habe ich leider nicht verstanden.";
+        current.setText("Sorry, das habe ich leider nicht verstanden.");
         
         std::string lowerInput = toLowerCase(userInput);
 
         if (lowerInput.compare("an anfang") == 0)
             current = start;
 
-        if(lowerInput.compare(current.nutzerEingabe) == 0)
-            current.text = "Du wiederholst Dich!";
+        if(lowerInput.compare(current.getNutzerEingabe()) == 0)
+            current.setText("Du wiederholst Dich!");
 
-        current.nutzerEingabe = lowerInput;
+        current.getNutzerEingabe() = lowerInput;
 
-        for(int i = 0; i < current.verlauf.size(); i++)
-            if(current.verlauf[i].nutzerEingabe.compare(lowerInput) == 0 && current.text.compare(lowerInput) != 0)
+        // & um eine referenz zu dem obejkt zu erhalten
+        for(Node& x : current.getVerlauf())
+            if(x.getNutzerEingabe().compare(lowerInput) == 0 && current.getText().compare(lowerInput) != 0)
             {
-                 if(current.verlauf[i].repetable)
-                    current.verlauf[i].verlauf = current.verlauf;
-                current = current.verlauf[i];
-            }
+                 if(x.getRepetable())
+                    x.getVerlauf() = current.getVerlauf();
 
-       
+                current = x;
+                break;
+            }
     }
 
     bool abschied(std::string userInput)
@@ -87,6 +88,6 @@ public:
             return "Koennten Sie bitte etwas lauter sprechen.";
 
         respondNode(userInput);
-        return current.text;
+        return current.getText();
     }
 };
