@@ -53,20 +53,15 @@ public:
     void respondNode(std::string userInput) 
     {
         current.setText("Sorry, das habe ich leider nicht verstanden.");
-        
-        std::string lowerInput = toLowerCase(userInput);
 
-        if (lowerInput.compare("an anfang") == 0)
-            current = start;
-
-        if(lowerInput.compare(current.getNutzerEingabe()) == 0)
+        if(userInput.compare(current.getNutzerEingabe()) == 0)  // innerhalb von dieser methode sind gleiche eingaben erlaubt solange sie im verlauf vorhanden sind
             current.setText("Du wiederholst Dich!");
 
-        current.getNutzerEingabe() = lowerInput;
+        current.getNutzerEingabe() = userInput;
 
         // & um eine referenz zu dem obejkt zu erhalten
         for(Node& x : current.getVerlauf())
-            if(x.getNutzerEingabe().compare(lowerInput) == 0 && current.getText().compare(lowerInput) != 0)
+            if(x.getNutzerEingabe().compare(userInput) == 0 && current.getText().compare(userInput) != 0)
             {
                  if(x.getRepetable())
                     x.getVerlauf() = current.getVerlauf();
@@ -87,7 +82,12 @@ public:
         if (userInput.empty())
             return "Koennten Sie bitte etwas lauter sprechen.";
 
-        respondNode(userInput);
+        std::string lowerInput = toLowerCase(userInput);
+
+        if (userInput.compare("an anfang") == 0)
+            current = start; return current.getText();
+
+        respondNode(lowerInput);
         return current.getText();
     }
 };
